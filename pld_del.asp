@@ -1,0 +1,1 @@
+<%Response.Redirect "intpld_list.asp"%>

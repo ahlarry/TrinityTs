@@ -1,0 +1,32 @@
+<%
+Const SiteName="三佳科技挤出模具厂调试部管理系统"        '网站名称
+Const SiteTitle="三佳科技挤出模具厂调试部"        '网站标题
+Const SiteUrl="http://sj901/tsb"        '网站地址
+Const EnterpriseMail="http://192.168.16.3"        '企业邮局
+Const LogoUrl="imgv2/logo.png"        'Logo地址
+Const BannerUrl="Img/ad200609.swf"        'Banner地址
+Const High=170        '高度
+Const WebmasterName="朱磊"        '站长姓名
+Const WebmasterEmail="zul@chinatrinity.com"        '站长信箱
+Const Copyright="Copyright &copy; 2006-2007 三佳科技挤出模具厂 Inc. All rights reserved.<br>地址：中国安徽省铜陵市石城路电子工业区 邮编：244100<br>电话总机：0562-2627405，传真：0562-2627601<br>MSN：ahlarry@hotmail.com E-mail：zul@chinatrinity.com"        '版权信息
+Const MaxPerPage_Default=10        '首页每页产品或文章数
+Const New_count=5        '首面新闻资讯条数
+Const Product_count=8        '首面产品列表数
+Const MaxPerPage_Search=10        '文章搜索页每页文章数
+Const MaxPerPage_Content=200000        '每页显示大约字符数
+Const NewsComment="Yes"        '是否启用新闻评论功能
+Const EnableArticleCheck="Yes"        '是否启用文章审核功能
+Const EnableUploadFile="Yes"        '是否开放文件上传
+Const PopAnnounce="Yes"        '是否弹出公告窗口
+Const HitsOfHot=20        '热门文章点击数
+Const MaxFileSize=500        '上传文件大小限制
+Const SaveUpFilesPath="UploadFiles"        '存放上传文件的目录
+Const UpFileType="gif|jpg|bmp|png|swf|doc|rar"        '允许的上传文件类型
+Const DelUpFiles="Yes"        '删除文章时是否同时删除文章中的上传文件
+Const SessionTimeout=600        'Session会话的保持时间
+Const MailObject="Jmail"        '邮件发送组件
+Const MailServer="192.168.16.3"        '用来发送邮件的SMTP服务器
+Const MailServerUserName="zul@chinatrinity.com"        '登录用户名
+Const MailServerPassWord="123456"        '登录密码
+Const MailDomain="wrtx.cn"        '域名
+%>

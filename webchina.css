@@ -1,0 +1,36 @@
+body {
+	background-image: url(imgV2/bg_1.png);
+	background-repeat: repeat-x;
+	background-color: #CCFFFF;
+}
+.login  {
+	font-family: "ËÎÌו";
+	font-size: 13px;
+	background-image: url(/Imgv2/typebg.gif);
+	background-repeat: no-repeat;
+	border-top-color: #00CCFF;
+	border-right-color: #00CCFF;
+	border-bottom-color: #00CCFF;
+	border-left-color: #00CCFF;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+}
+.bg_x {
+	background-repeat: repeat-x;
+}
+.po img {
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: #CCCCCC;
+	border-right-color: #666666;
+	border-bottom-color: #666666;
+	border-left-color: #CCCCCC;
+}
