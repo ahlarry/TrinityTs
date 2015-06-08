@@ -250,9 +250,9 @@ End If
 set rs=server.createobject("adodb.recordset")
 If StrRwlx="1" Then
 	If strSql="" then
-		sqltex="select * from mission Order BY ddh,lsh desc"
+		sqltex="select * from mission Order BY sjjssj desc,ddh,lsh desc"
 	else
-		sqltex="select * from mission where "&strSql&" Order BY ddh,lsh desc"
+		sqltex="select * from mission where "&strSql&" Order BY sjjssj desc,ddh,lsh desc"
 	End If
 else
 	If strSql="" then
@@ -304,8 +304,8 @@ If StrRwlx="1" Then
           <th class="STYLE4">任务</th>
           <th class="STYLE4">调试次数</th>
           <th class="STYLE4">调试结束</th>
-          <th class="STYLE4">入库时间</th>
-          <th class="STYLE4">出库时间</th>
+          <th class="STYLE4">额定分值</th>
+          <th class="STYLE4">实际分值</th>
           <th class="STYLE4">操作</th>
         </tr>
         <%if not rs.eof then
@@ -320,8 +320,8 @@ do while not rs.eof
           <td class="STYLE4"><div align="center"><%=Rs("rwlx")%>&nbsp;</div></td>
           <td class="STYLE4"><div align="center"><%=Rs("sjtscs")%>&nbsp;</div></td>
           <td class="STYLE4"><div align="center"><%=FormatDateTime(Rs("sjjssj"),2)%>&nbsp;</div></td>
-          <td class="STYLE4"><div align="center"><%=FormatDateTime(Rs("rksj"),2)%>&nbsp;</div></td>
-          <td class="STYLE4"><div align="center"><%=FormatDateTime(Rs("cksj"),2)%>&nbsp;</div></td>
+          <td class="STYLE4"><div align="center"><%=Rs("cntsfz")%>&nbsp;</div></td>
+          <td class="STYLE4"><div align="center"><%=Rs("cnsjfz")%>&nbsp;</div></td>
           <td class="STYLE4"><label>
             <div align="center"> <a href="pld_change.asp?s_lsh=<%=Rs("lsh")%>">更改</a>|<a href="intpld_del.asp?id=<%=Rs("ID")%>&lsh=<%=Rs("lsh")%>" onClick="return confirm('删除后将不能恢复!\n\n确认删除  <%=Rs("lsh")%> 任务书?');">删除</a>
               </label>
@@ -445,9 +445,7 @@ Function SearchInfo()
           <option value="0" selected="selected">全部</option>
           <option value="1" <%If strrwzt="1" Then%>selected="selected"<%End If%>>正在调试</option>
         <%If StrRwlx=1 Then%>
-          <option value="2" <%If strrwzt="2" Then%>selected="selected"<%End If%>>调试结束</option>
-          <option value="3" <%If strrwzt="3" Then%>selected="selected"<%End If%>>入库打包</option>
-          <option value="4" <%If strrwzt="4" Then%>selected="selected"<%End If%>>出库发货</option>
+          <option value="4" <%If strrwzt="4" Then%>selected="selected"<%End If%>>调试结束</option>
          <%else%>
           <option value="2" <%If strrwzt="2" Then%>selected="selected"<%End If%>>验收合格</option>
          <%End If%>

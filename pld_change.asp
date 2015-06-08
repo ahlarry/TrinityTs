@@ -1,7 +1,6 @@
 <!--#include file="Inc/mission.asp" -->
 <!--#include file="Inc/Sysconn.asp" -->
 <!--#include file="inc/Skin_CSS.asp"-->
-<!--#include file="dmlx.asp"-->
 <SCRIPT language=Javascript src="Inc/jsfunc.js"></SCRIPT>
 <%
 If session("UserName")="" then
@@ -12,6 +11,37 @@ Dim StrLsh,StrRwlx
 StrRwlx=Trim(Request("rwlx"))
 StrLsh=Trim(Request("s_lsh"))
 If StrRwlx="" Then StrRwlx=1
+
+    Dim c_cjqy, c_dmdj
+    c_cjqy="" : c_dmdj=""
+	'取出断面等级
+	strSql="select distinct cjqy from sys_jldj"
+	set rs=server.createobject("adodb.recordset")
+	rs.open strSql,conn,1,1
+	do while not rs.eof
+		if c_cjqy <> "" then
+			c_cjqy = c_cjqy & "|||" & rs("cjqy")
+		else
+			c_cjqy = rs("cjqy")
+		end if
+		rs.movenext
+	loop
+	rs.close
+	strSql="select distinct dmdj from sys_jldj"
+	set rs=server.createobject("adodb.recordset")
+	rs.open strSql,conn,1,1
+	do while not rs.eof
+		if c_dmdj <> "" then
+			c_dmdj = c_dmdj & "|||" & rs("dmdj")
+		else
+			c_dmdj = rs("dmdj")
+		end if
+		rs.movenext
+	loop
+	rs.close
+	c_cjqy = split(c_cjqy, "|||")
+	c_dmdj = split(c_dmdj, "|||")
+
 %>
 <style type="text/css">
 <!--
@@ -108,119 +138,118 @@ Function xchange(Rs)
     <caption>
     <span class="STYLE2">更改流水号为<%=Rs("lsh")%>的任务书</span><br />
     </caption>
-    <tr>
-      <th colspan="6" scope="col"><div align="left" class="STYLE4">模具信息</div></th>
-    </tr>
-    <tr>
-      <td width="100"><span class="STYLE4">订单号</span></td>
-      <td><input name="ddh" type="text" id="ddh" size="15" value=<%=Rs("ddh")%>>
-        <input name="iid" type="hidden" id="iid" value=<%=Rs("id")%>></td>
-      <td width="100"><span class="STYLE4">流水号</span></td>
-      <td><input name="lsh" type="text" id="lsh" size="15" value=<%=Rs("lsh")%>></td>
-      <td width="100"><span class="STYLE4">客户名称</span></td>
-      <td><input name="khmc" type="text" id="khmc" size="15" value=<%=Rs("khmc")%>></td>
-    </tr>
-    <tr>
-      <td><span class="STYLE4">生产线</span></td>
-      <td><input name="scxh" type="text" id="scxh" size="10" value=<%=Rs("scx")%>></td>
-      <td><span class="STYLE4">牵引速度</span></td>
-      <td><input name="qysd" type="text" id="qysd" size="10" onKeyPress="javascript:validationNumber(this, 'u_float', 100, '');" onChange="CheckYl();" value=<%=Rs("qysd")%>>
-        m/min<br /></td>
-      <td><span class="STYLE4">米重</span></td>
-      <td><input name="mz" type="text" id="mz" size="10" onKeyPress="javascript:validationNumber(this, 'u_float', 100, '');" onChange="CheckYl();" value=<%=Rs("mz")%>>
-        Kg/m</td>
-    </tr>
-    <tr>
-      <td><span class="STYLE4">技术等级</span></td>
-      <td><span class="STYLE4">
-        <label>
-          <select name="jsdj" id="jsdj" onChange="CheckYl();">
-            <option value="A类" <%if Rs("jsdj")="A类" Then%>selected<%End If%>>A类</option>
-            <option value="B类" <%if Rs("jsdj")="B类" Then%>selected<%End If%>>B类</option>
-            <option value="C类" <%if Rs("jsdj")="C类" Then%>selected<%End If%>>C类</option>
-          </select>
-        </label>
-        </span></td>
-      <td><span class="STYLE4">模具等级</span></td>
-      <td><span class="STYLE4">
-        <label>
-          <select name="mjdj" id="mjdj" onChange="CheckYl();">
-            <option value="A类" <%if Rs("mjdj")="A类" Then%>selected<%End If%>>A类</option>
-            <option value="B类" <%if Rs("mjdj")="B类" Then%>selected<%End If%>>B类</option>
-            <option value="C类" <%if Rs("mjdj")="C类" Then%>selected<%End If%>>C类</option>
-          </select>
-        </label>
-        </span></td>
-      <td onMouseover="GradientClose();" onMouseMove="MenuClick();"><span class="STYLE4">断面等级</span></td>
-      <td><span class="STYLE4">
-        <select name="dmdj" id="dmdj" onChange="CheckYl();">
-          <%for i = 0 to ubound(c_dmdj)%>
-          <option value='<%=c_dmdj(i)%>' <%if Rs("dmdj")=c_dmdj(i) Then%>selected<%End If%>><%=c_dmdj(i)%></option>
-          <%next%>
-        </select>
-        </span></td>
-    </tr>
-    <tr>
-      <td><span class="STYLE4">任务类型</span></td>
-      <td><select name="rwnr" id="rwnr" onChange="CheckYl();">
-          <option value="全套" <%if Rs("rwlx")="全套" Then%>selected<%End If%>>全套</option>
-          <option value="机头" <%if Rs("rwlx")="机头" Then%>selected<%End If%>>机头</option>
-          <option value="定型" <%if Rs("rwlx")="定型" Then%>selected<%End If%>>定型</option>
-          <option value="新品" <%if Rs("rwlx")="新品" Then%>selected<%End If%>>新品</option>
-          <option value="粗调" <%if Rs("rwlx")="粗调" Then%>selected<%End If%>>粗调</option>
-          <option value="非调" <%if Rs("rwlx")="非调" Then%>selected<%End If%>>非调</option>
-          <option value="TB" <%if Rs("rwlx")="TB" Then%>selected<%End If%>>TB</option>
-          <option value="TA" <%if Rs("rwlx")="TA" Then%>selected<%End If%>>TA</option>
-        </select></td>
-      <td><span class="STYLE4">模具类型</span></td>
-      <td><span class="STYLE4">
-        <select name="mjlx" id="mjlx" onChange="CheckYl();">
-          <%
-                Dim c_mjlx,TmpSql,TmpRs
-                c_mjlx=""
-				'取出模具类型
-				TmpSql="select * from mjlx"
-				set TmpRs=server.createobject("adodb.recordset")
-				TmpRs.open TmpSql,conn,1,1
-				do while not TmpRs.eof
-				if c_mjlx <> "" then
-					c_mjlx = c_mjlx & "|||" & TmpRs("lx")
-				else
-					c_mjlx = TmpRs("lx")
-				end if
-				TmpRs.movenext
-				loop
-				TmpRs.close
-				c_mjlx = split(c_mjlx, "|||")
-                for i = 0 to ubound(c_mjlx)%>
-          <option value='<%=c_mjlx(i)%>' <%if Rs("mjlx")=c_mjlx(i) Then%>selected<%End If%>><%=c_mjlx(i)%></option>
-          <%next%>
-        </select>
-        </span></td>
-      <td><span class="STYLE4">主壁厚﹥2.7mm</span></td>
-      <td><span class="STYLE4">
-        <label>
-          <input name="bh" type="checkbox" id="bh" onClick="CheckYl();" value="1" <%if Rs("bh")=1 Then%>checked<%End If%>>
-          是</label>
-        </span></td>
-    </tr>
-    <tr>
-      <td><span class="STYLE4">型材寄样</span></td>
-      <td><span class="STYLE4">
-        <label>
-          <input name="xcjy" type="radio" onClick="CheckYl();" value="1" <%if Rs("jy")=1 Then%>checked<%End If%>>
-          是</label>
-        <label>
-          <input name="xcjy" type="radio" onClick="CheckYl();" value="0" <%if Rs("jy")=0 Then%>checked<%End If%>>
-          否</label>
-        </span></td>
-      <td><span class="STYLE4">额定调试用料</span></td>
-      <td><input name="tsyl" type="text" id="tsyl" size="10" value=<%=Rs("edtsyl")%>>
+          <tr>
+            <th colspan="6" scope="col"><div align="left" class="STYLE4">模具信息</div></th>
+          </tr>
+          <tr>
+            <td width="100"><span class="STYLE4">流水号</span></td>
+            <td><input name="lsh" type="text" id="lsh" size="15" value=<%=Rs("lsh")%> /></td>
+            <td width="100"><span class="STYLE4">订单号</span></td>
+            <td><span class="STYLE4">
+              <label>
+                <input name="ddh" type="text" id="ddh" size="15" value=<%=Rs("ddh")%> />
+              </label>
+              </span></td>
+            <td width="100"><span class="STYLE4">客户名称</span></td>
+            <td><input name="khmc" type="text" id="khmc" size="15" value=<%=Rs("khmc")%> /></td>
+          </tr>
+          <tr>
+            <td><span class="STYLE4">生产线</span></td>
+            <td><select name="scxh" id="scxh">
+                <option value="0" <%if Rs("scx")="0" Then%>selected<%End If%>>金湖65</option>
+                <option value="1" <%if Rs("scx")="1" Then%>selected<%End If%>>韦柏114</option>
+                <option value="2" <%if Rs("scx")="2" Then%>selected<%End If%>>AROGOS93</option>
+                <option value="3" <%if Rs("scx")="3" Then%>selected<%End If%>>辛辛那提58 </option>
+                <option value="4" <%if Rs("scx")="4" Then%>selected<%End If%>>辛辛那提112</option>
+                <option value="5" <%if Rs("scx")="5" Then%>selected<%End If%>>克劳斯玛菲90</option>
+              </select></td>
+            <td><span class="STYLE4">牵引速度</span></td>
+            <td><p class="STYLE4">
+                <input name="qysd" type="text" id="qysd" size="10" value=<%=Rs("qysd")%> onKeyPress="javascript:validationNumber(this, 'u_float', 100, '');" onChange="CheckYl();">
+                m/min <br />
+              </p></td>
+            <td><span class="STYLE4">米重</span></td>
+            <td><input name="mz" type="text" id="mz" size="10" value=<%=Rs("mz")%>  onKeyPress="javascript:validationNumber(this, 'u_float', 100, '');" onChange="CheckYl();">
+              Kg/m</td>
+          </tr>
+          <tr>
+            <td><span class="STYLE4">任务类型</span></td>
+            <td><select name="rwnr" id="rwnr" onChange="CheckYl();">
+                <option value="全套" <%if Rs("rwlx")="全套" Then%>selected<%End If%>>全套</option>
+                <option value="机头" <%if Rs("rwlx")="机头" Then%>selected<%End If%>>机头</option>
+                <option value="定型" <%if Rs("rwlx")="定型" Then%>selected<%End If%>>定型</option>
+                <option value="新品" <%if Rs("rwlx")="新品" Then%>selected<%End If%>>新品</option>
+                <option value="粗调" <%if Rs("rwlx")="粗调" Then%>selected<%End If%>>粗调</option>
+                <option value="非调" <%if Rs("rwlx")="非调" Then%>selected<%End If%>>非调</option>
+                <option value="修理" <%if Rs("rwlx")="修理" Then%>selected<%End If%>>修理</option>
+                <option value="TB" <%if Rs("rwlx")="TB" Then%>selected<%End If%>>TB</option>
+                <option value="TA" <%if Rs("rwlx")="TA" Then%>selected<%End If%>>TA</option>
+              </select></td>
+            <td><span class="STYLE4">客户类别</span></td>
+            <td><span class="STYLE4">
+                <select name="cjqy" id="cjqy" onChange="CheckYl();">
+       	         <%for i = 0 to ubound(c_cjqy)%>
+         	       <option value='<%=c_cjqy(i)%>' <%if Rs("cjqy")=c_cjqy(i) Then%>selected<%End If%>><%=c_cjqy(i)%></option>
+                <%next%>
+                </select>
+              </span></td>
+            <td><span class="STYLE4">断面等级</span></td>
+            <td><span class="STYLE4">
+              <select name="dmdj" id="dmdj" onChange="CheckYl();">
+                <%for i = 0 to ubound(c_dmdj)%>
+                	<option value='<%=c_dmdj(i)%>' <%if Rs("dmdj")=c_dmdj(i) Then%>selected<%End If%>><%=c_dmdj(i)%></option>
+                <%next%>
+              </select>
+              </span></td>
+          </tr>
+          <tr>
+            <td><span class="STYLE4">模具类型</span></td>
+            <td><span class="STYLE4">
+              <select name="mjlx" id="mjlx" onChange="CheckYl();">
+                  <option value="普通" <%if Rs("mjlx")="普通" Then%>selected<%End If%>>普通</option>
+                  <option value="表面共挤" <%if Rs("mjlx")="表面共挤" Then%>selected<%End If%>>表面共挤</option>
+                  <option value="胶条共挤" <%if Rs("mjlx")="胶条共挤" Then%>selected<%End If%>>胶条共挤</option>
+                  <option value="全包覆共挤" <%if Rs("mjlx")="全包覆共挤" Then%>selected<%End If%>>全包覆共挤</option>
+                  <option value="表面浮雕共挤" <%if Rs("mjlx")="表面浮雕共挤" Then%>selected<%End If%>>表面浮雕共挤</option>
+                  <option value="1模头+1定型双腔模具" <%if Rs("mjlx")="1模头+1定型双腔模具" Then%>selected<%End If%>>1模头+1定型双腔模具</option>
+                  <option value="2模头+2定型双腔模具" <%if Rs("mjlx")="2模头+2定型双腔模具" Then%>selected<%End If%>>2模头+2定型双腔模具</option>
+                  <option value="白料+共挤板共用定型" <%if Rs("mjlx")="白料+共挤板共用定型" Then%>selected<%End If%>>白料+共挤板共用定型</option>
+                  <option value="白料+共挤模头共用定型" <%if Rs("mjlx")="白料+共挤模头共用定型" Then%>selected<%End If%>>白料+共挤模头共用定型</option>
+              </select>
+              </span></td>
+            <td><span class="STYLE4">欧式主材腔室﹥5</span></td>
+            <td><span class="STYLE4">
+              <label>
+                <input name="qs" type="checkbox" id="qs" onClick="CheckYl();" value="1" <%if Rs("qs")=1 Then%>checked<%End If%>>
+                是</label>
+              </span></td>
+            <td><span class="STYLE4">主壁厚≥2.8mm</span></td>
+            <td><span class="STYLE4">
+              <label>
+                <input name="bh" type="checkbox" id="bh" onClick="CheckYl();" value="1" <%if Rs("bh")=1 Then%>checked<%End If%>>
+                是</label>
+              </span></td>
+          </tr>
+          <tr id="cnwdh">
+            <td><span class="STYLE4">额定调试次/天数</span></td>
+            <td><input name="tscs" type="text" id="tscs" size="10" readonly="true" value=Rs("edtscs") /></td>
+            <td><span class="STYLE4">型材寄样</span></td>
+            <td><span class="STYLE4">
+              <label>
+                <input name="xcjy" type="checkbox" onClick="CheckYl();" value="1" <%if Rs("jy")=1 Then%>checked<%End If%>>
+                是</label>
+              </span></td>
+            <td><span class="STYLE4">速度 ≥ 3m/min</span></td>
+            <td><span class="STYLE4">
+              <label>
+                <input name="sd" type="checkbox" id="sd" onClick="CheckYl();" value="1" <%if Rs("sd")=1 Then%>checked<%End If%>>
+                是</label>
+              </span></td>
+          </tr>
+          <tr>
+    		  <td><span class="STYLE4">额定调试用料</span></td>
+     		  <td><input name="tsyl" type="text" id="tsyl" size="10" value=<%=Rs("edtsyl")%>>
         &nbsp;Kg</td>
-      <td><span class="STYLE4">额定调试次/天数</span></td>
-      <td><input name="tscs" type="text" id="tscs" size="10" readonly="true" value=<%=Rs("edtscs")%>></td>
-    </tr>
-    <tr>
       <td width="15%" class="STYLE4">粉料情况</td>
       <td class="STYLE4"><label>
           <select name="smlqk" id="smlqk" onChange="Checksml()">
@@ -239,27 +268,15 @@ Function xchange(Rs)
           </select>
           <input id="gjltxt" name="gjltxt" type="text" id="gjltxt" size="20" style="Display:none;" value=<%=Rs("gjlqk")%>>
         </p></td>
-      <td class="STYLE4">客户区域:</td>
-      <td class="STYLE4"><select name="cjqy" id="cjqy">
-          <option value="国外" selected >国外</option>
-          <option value="国内" <%if Rs("CJQY")<>"国外" Then%>selected<%End If%>>国内</option>
-        </select></td>
-    </tr>
-    <tr>
-      <td><span class="STYLE4">腔室</span></td>
-      <td><span class="STYLE4">
-        <label>
-          <input name="qs" type="checkbox" id="qs" onClick="CheckYl();" value="1" <%if Rs("qs")=1 Then%>checked<%End If%>>
-          > 4</label>
-        </span></td>
-      <td><span class="STYLE4">调试分值:</span></td>
-      <td colspan="3" class="STYLE4">&nbsp;<span id=fzxs class="STYLE4"></span>
-        <input type="hidden" name="Hijhjs" value=<%=Rs("jhjssj")%>>
-        <input type="hidden" name="Cntsfz" value=<%=Rs("cntsfz")%>>
-        <input type="hidden" name="Cwtsfz" value=<%=Rs("cwtsfz")%>>
-        <input type="hidden" name="Scxfz" value=<%=Rs("scxfz")%>>
-        <input type="hidden" name="Zxfz" value=<%=Rs("bgxfz")%>></td>
-    </tr>
+          </tr>
+          <tr>
+            <td><span class="STYLE4">调试分值:</span></td>
+            <td colspan="5" class="STYLE4">&nbsp; <span id=fzxs class="STYLE4"></span>
+              <input type="hidden" name="Cntsfz" value=0 />
+              <input type="hidden" name="Cwtsfz" value=0 />
+              <input type="hidden" name="Scxfz" value=0 />
+              <input type="hidden" name="Zxfz" value=0 />
+          </tr>
   </table>
   <table width="98%" border="2" cellpadding="0" bordercolor="#33FFCC">
     <tr>
@@ -342,11 +359,11 @@ function CheckYl()	//根据速度和米重确定额定用料
 		//额定调试用料=米重*速度*60(分钟)*额定调试次数
 	TmpYl=document.pldadd.mz.value*document.pldadd.qysd.value*60*strdxcs;
 	//大、小双腔对调试用料的影响
-	if (document.pldadd.mjlx.value.indexOf("大双腔")>=0)
+	if (document.pldadd.mjlx.value.indexOf("2定型")>=0)
 	{
 		TmpYl=TmpYl*1.7;
 	}
-	if (document.pldadd.mjlx.value.indexOf("小双腔")>=0)
+	if (document.pldadd.mjlx.value.indexOf("1定型")>=0)
 	{
 		TmpYl=TmpYl*1.5;
 	}
@@ -387,8 +404,6 @@ function CheckJl() //模具调试奖励等级计算函数
 {
 	var Dm = new Array();
 	var Jl = new Array();
-	var Cnxs = new Array();
-	var Cwxs = new Array();
 	var key;
 <%
 	strSql="select * from sys_jldj order by ID"
@@ -397,171 +412,117 @@ function CheckJl() //模具调试奖励等级计算函数
 	i=0
 	do while not rs.eof
 %>
-Dm[<%=i%>]="<%=rs("dmdj") & "," & rs("jsdj")%>";
+Dm[<%=i%>]="<%=rs("cjqy") & "," & rs("dmdj")%>";
 Jl[<%=i%>]="<%=rs("mtcs") & "," & rs("dxcs") & "," & rs("cntsjl") & "," & rs("scxjl") & "," & rs("cwtsjl") & "," & rs("cwtsts") & "," & rs("zxjl")%>";
 <%
 	i = i + 1
 	rs.movenext
 	loop
 	rs.close
-
-	strSql="select * from sys_mjdj order by ID"
-	set rs=server.createobject("adodb.recordset")
-	rs.open strSql,conn,1,1
-	i=0
-	do while not rs.eof
 %>
-Cnxs[<%=i%>]="<%=rs("Cnxs")%>";
-Cwxs[<%=i%>]="<%=rs("Cwxs")%>";
-<%
-		i = i + 1
-		rs.movenext
-	loop
-	rs.close
-%>
+	var JcCs="<%=TmpTscs%>";
+		JcCs=JcCs.split(":");
+	var Mtcs_inc1 = 0;	//调试次数增量2(模具类型对调试次数的影响)
+	var Mtcs_inc2 = 0;	//调试次数增量2(型材寄样对调试次数的影响)
 
-	var Mtcs_inc1 = 0	//模头次数增量1(模具等级对模头调试次数的影响)
-	var Mtcs_inc2 = 0	//模头次数增量2(模具类型对模头调试次数的影响)
-	var Mtcs_inc3 = 0	//模头次数增量3(壁厚对模头调试次数的影响)
-	var Mtcs_inc4 = 0	//模头次数增量4(寄样对模头调试次数的影响)
+	var Tsfz_inc1 = 0;	//分值增量2(模具类型对厂内分值的影响+)
+	var Tsfz_inc2 = 1;	//分值增量1(速度对厂内分值的影响*)
+	var Tsfz_inc3 = 0;	//分值增量3(腔室对分值的影响+)
+	var Tsfz_inc4 = 0;	//分值增量4(壁厚对分值的影响+)
+	var Tsfz_inc5 = 1;	//分值增量4(任务内容对分值的影响*)
 
-	var Dxcs_inc1 = 0	//定型次数增量1(模具等级对定型调试次数的影响)
-	var Dxcs_inc2 = 0	//定型次数增量2(模具类型对定型调试次数的影响)
-	var Dxcs_inc3 = 0	//定型次数增量3(壁厚对定型调试次数的影响)
-	var Dxcs_inc4 = 0	//定型次数增量4(寄样对定型调试次数的影响)
-	var Dxcs_inc5 = 0	//定型次数增量5(腔室大于4对模头调试次数的影响)
-
-	var Tsfz_inc1 = 0	//分值增量1(模具等级对厂内分值的影响)
-	var Tsfz_inc2 = 0	//分值增量2(模具等级对厂外分值的影响)
-	var Tsfz_inc3 = 0	//分值增量3(模具类型对分值的影响)
-	var Tsfz_inc4 = 0	//分值增量4(壁厚对分值的影响)
-	var Tsfz_inc5 = 0	//分值增量5(模具等级及主辅材对装箱分值的影响)
-	var Tsfz_inc6 = 1	//分值增量6(模具类型及腔数对装箱分值的影响)
-	var Tsfz_inc7 = 1	//分值增量7(任务内容对厂外分值的影响)
-	var Tsfz_inc8 = 0	//分值增量8(腔室大于4对分值的影响)
-
-	if (document.pldadd.dmdj.selectedIndex<4 && document.pldadd.mjlx.value.indexOf("双腔")>0){
-		Tsfz_inc6=1.732;
+	switch (document.pldadd.mjlx.selectedIndex){	//模具类型对调试次数及分值、装箱分值的影响
+		case 0 : Mtcs_inc1=0;Tsfz_inc1=0;break;
+		case 1 : Mtcs_inc1=0;Tsfz_inc1=0.1;break;
+		case 2 : Mtcs_inc1=0;Tsfz_inc1=0.1;break;
+		case 3 : Mtcs_inc1=0;Tsfz_inc1=0.3;break;
+		case 4 : Mtcs_inc1=0;Tsfz_inc1=0.2;break;
+		case 5 : Mtcs_inc1=0;Tsfz_inc1=0.4;break;
+		case 6 : Mtcs_inc1=0;Tsfz_inc1=0.7;break;
+		case 7 : Mtcs_inc1=0;Tsfz_inc1=0.2;break;
+		case 8 : Mtcs_inc1=0;Tsfz_inc1=0.4;break;
 	}
-
-	switch (document.pldadd.mjdj.selectedIndex){//模具等级对调试次数、调试分值、装箱分值的影响
-		case 0 : Mtcs_inc1=0;Dxcs_inc1=1;Tsfz_inc1=Cnxs[0];Tsfz_inc2=Cwxs[0];
-				 if (document.pldadd.dmdj.selectedIndex<5){
-				 	Tsfz_inc5=35;
-				 }
-				 else{
-				 	Tsfz_inc5=25;
-				}
-				break;
-		case 1 : Mtcs_inc1=0;Dxcs_inc1=0;Tsfz_inc1=Cnxs[1];Tsfz_inc2=Cwxs[1];break;
-		case 2 : Mtcs_inc1=0;Dxcs_inc1=0;Tsfz_inc1=Cnxs[2];Tsfz_inc2=Cwxs[2];break;
+	if(document.all.sd.checked==false){		//速度对调试次数及分值的影响
+		Tsfz_inc2=0.84;
 	}
-	if (document.pldadd.dmdj.selectedIndex==8){
-	 	Tsfz_inc1=1;
-	 	Tsfz_inc2=1;
-	 	Tsfz_inc5=0;
-	 }
-	//大板模装箱分值固定为1000，不参与变模具等级的变化
-
-
-	switch (document.pldadd.mjlx.selectedIndex){//模具类型对调试次数及分值、装箱分值的影响
-		case 0 : Mtcs_inc2=0;Dxcs_inc2=0;Tsfz_inc3=0;break;
-		case 1 : Mtcs_inc2=0;Dxcs_inc2=2;Tsfz_inc3=0.5;Tsfz_inc6=2;break;
-		case 2 : Mtcs_inc2=1;Dxcs_inc2=1;Tsfz_inc3=0.7;Tsfz_inc6=2;break;
-		case 3 : Mtcs_inc2=0;Dxcs_inc2=1;Tsfz_inc3=0.3;break;
-		case 4 : Mtcs_inc2=0;Dxcs_inc2=1;Tsfz_inc3=0.25;break;
-		case 5 : Mtcs_inc2=0;Dxcs_inc2=1;Tsfz_inc3=0.1;break;
-		case 6 : Mtcs_inc2=1;Dxcs_inc2=1;Tsfz_inc3=0.2;break;
-		case 7 : Mtcs_inc2=0;Dxcs_inc2=1;Tsfz_inc3=0.15;break;
-		case 8 : Mtcs_inc2=0;Dxcs_inc2=0;Tsfz_inc3=0.05;break;
-		case 9 : Mtcs_inc2=1;Dxcs_inc2=1;Tsfz_inc3=0.4;break;
+	if(document.all.qs.checked==true){		//腔室>5对调试次数及分值的影响
+		Tsfz_inc3=0.1;
 	}
-
 	if(document.all.bh.checked==true){		//壁厚对调试次数及分值的影响
-		Mtcs_inc3=0;Dxcs_inc3=1;Tsfz_inc4=0.1;
+		Tsfz_inc4=0.1;
 	}
-
-	if (document.pldadd.xcjy[0].checked){	//型材寄样对调试次数的影响
-		Mtcs_inc4=1;Dxcs_inc4=1;
+	if (document.pldadd.xcjy.checked==true){	//型材寄样对调试次数的影响
+		Mtcs_inc2=2;
 	}
-
-	if(document.all.qs.checked==true){		//腔室>4对调试次数及分值的影响
-		Dxcs_inc5=1;Tsfz_inc8=0.1;
-	}
-
-	var Mtcs=Mtcs_inc1 + Mtcs_inc2 + Mtcs_inc3 + Mtcs_inc4;	//模头调试次数变量
-	var Dxcs=Dxcs_inc1 + Dxcs_inc2 + Dxcs_inc3 + Dxcs_inc4 + Dxcs_inc5;	//定型调试次数变量
 	var Ftxs=1;//非调系数，用以判断是否需要在厂外调试分值上再加厂内分值的一半。
-	for (key in Dm){
-		if (Dm[key]==document.pldadd.dmdj.value + "," + document.pldadd.jsdj.value){//技术等级、断面等级
-			var arrTmp = Jl[key].split(",");
+	var Mtcs=Mtcs_inc1 + Mtcs_inc2;//调试次数变量
 
+	for (key in Dm){
+		if (Dm[key]==document.pldadd.cjqy.value + "," + document.pldadd.dmdj.value){//模具等级、断面等级
+			var arrTmp = Jl[key].split(",");
 			switch (document.pldadd.rwnr.value){//任务类型对调试次数和分值的影响
 				case "全套" :
-				document.pldadd.tscs.value=Number(arrTmp[0]) + Mtcs + ":" + (Number(arrTmp[1]) + Dxcs);break;
-				case "机头" :
-				document.pldadd.tscs.value=Number(arrTmp[0]) + Mtcs + ":0";
-				arrTmp[2]=Math.round(arrTmp[2]*0.3);
-				arrTmp[3]=Math.round(arrTmp[3]*0.3);
-				arrTmp[6]=0;Tsfz_inc5=0;Tsfz_inc6=1;		//装箱分值
-				Tsfz_inc7=0.3;
-				break;
+					document.pldadd.tscs.value=Number(JcCs[0]) + Mtcs + ":" + (Number(JcCs[1]) + Mtcs);break;
+					case "机头" :
+					document.pldadd.tscs.value=Number(JcCs[0]) + Mtcs + ":0";
+					arrTmp[2]=Math.round(arrTmp[2]*0.3);
+					arrTmp[3]=Math.round(arrTmp[3]*0.3);
+					arrTmp[6]=10;		//装箱分值
+					Tsfz_inc5=0.3;
+					break;
 				case "定型" :
-				document.pldadd.tscs.value="0:" + (Number(arrTmp[1]) + Dxcs);
-				arrTmp[2]=Math.round(arrTmp[2]*0.7);
-				arrTmp[3]=Math.round(arrTmp[3]*0.7);
-				arrTmp[6]=0;Tsfz_inc5=0;Tsfz_inc6=1;		//装箱分值
-				Tsfz_inc7=0.7;
-				break;
+					document.pldadd.tscs.value="0:" + (Number(JcCs[1]) + Mtcs);
+					arrTmp[2]=Math.round(arrTmp[2]*0.7);
+					arrTmp[3]=Math.round(arrTmp[3]*0.7);
+					arrTmp[6]=0;		//装箱分值
+					Tsfz_inc5=0.7;
+					break;
 				case "新品" :
 					document.pldadd.tscs.value="0:0";
 					arrTmp[2]=Math.round(arrTmp[2]*1.7);
 					arrTmp[3]=Math.round(arrTmp[3]*1.7);
 					arrTmp[4]=Math.round(arrTmp[4]*1.7);
-				break;
+					break;
 				case "粗调" :
-					document.pldadd.tscs.value=Number(arrTmp[0]) + Mtcs + ":" + (Number(arrTmp[1]) + Dxcs);
+					document.pldadd.tscs.value=Number(JcCs[0]) + Mtcs_inc1 + ":" + (Number(JcCs[1]) + Mtcs);
 					arrTmp[2]=Math.round(arrTmp[2]*0.6);
 					arrTmp[3]=Math.round(arrTmp[3]*0.6);
 					arrTmp[4]=Math.round(arrTmp[4]*0.6);
-					arrTmp[6]=Math.round(arrTmp[6]*0.6);								//装箱分值
+			     	arrTmp[6]=Math.round(arrTmp[6]*0.6);	//装箱分值
 					break;
 				case "非调" :
 					document.pldadd.tscs.value="0:0";
-//					arrTmp[2]=Math.round(arrTmp[2]*0);
 					Ftxs=0;
 					arrTmp[3]=Math.round(arrTmp[3]*0);
-//					arrTmp[4]=Math.round(arrTmp[4]*0.7);
-					arrTmp[6]=35;Tsfz_inc5=0;Tsfz_inc6=1;		//装箱分值
+					arrTmp[6]=35;		//装箱分值
+					break;
+				case "修理" :
+					document.pldadd.tscs.value=Number(JcCs[0]) + Mtcs + ":" + (Number(JcCs[1]) + Mtcs);
+					arrTmp[2]=Math.round(arrTmp[2]*0.3);
+					arrTmp[3]=Math.round(arrTmp[3]*0.3);
+					arrTmp[4]=Math.round(arrTmp[4]*0.3);
 					break;
 				case "TB" :
 					document.pldadd.tscs.value="0:0";
 					arrTmp[2]=Math.round(arrTmp[2]*0);
 					arrTmp[3]=Math.round(arrTmp[3]*0);
-					arrTmp[6]=20;Tsfz_inc5=0;Tsfz_inc6=1;		//装箱分值
+					arrTmp[6]=20;		//装箱分值
 					break;
 				case "TA" :
-					document.pldadd.tscs.value=Number(arrTmp[0]) + Mtcs + ":" + (Number(arrTmp[1]) + Dxcs);
+					document.pldadd.tscs.value=Number(JcCs[0]) + Mtcs + ":" + (Number(JcCs[1]) + Mtcs);
 					if (document.pldadd.dmdj.selectedIndex<5){	//装箱分值
 				 		arrTmp[6]=140;
 					 }
 					else{
 				 		arrTmp[6]=90;
 					}
-					Tsfz_inc5=0;Tsfz_inc6=1;
 					break;
 			}
-
-//			if (document.pldadd.rwlx[1].checked){	//厂外调试对调试次数的影响
-//				document.pldadd.tscs.value=arrTmp[5]
-//			}
-
-			var StrCntsfz=Math.round(arrTmp[2]*Tsfz_inc1*(1+Tsfz_inc3+Tsfz_inc4+Tsfz_inc8));
-			var StrScxfz=Math.round(arrTmp[3]*Tsfz_inc1*(1+Tsfz_inc3+Tsfz_inc4+Tsfz_inc8));
-//			var StrCwtsfz=Math.round(arrTmp[4]*Tsfz_inc2*(1+Tsfz_inc3+Tsfz_inc4+Tsfz_inc8));
-			var StrCwtsfz=Math.round((arrTmp[4]*1*(1+Tsfz_inc3+Tsfz_inc4+Tsfz_inc8)-StrCntsfz*0.5*(Ftxs-1))*Tsfz_inc7);
+			var StrCntsfz=Math.round(arrTmp[2]*Tsfz_inc2*Tsfz_inc5*(1+Tsfz_inc1+Tsfz_inc3+Tsfz_inc4));
+			var StrScxfz=1;
+			var StrCwtsfz=1;
 			var StrCntsfz=StrCntsfz*Ftxs;
-			var StrZxfz=Math.round(arrTmp[6]*Tsfz_inc6+Tsfz_inc5);
+			var StrZxfz=1;
 			fzxs.innerHTML="厂内调试:" + StrCntsfz + ";生产线:" + StrScxfz + ";装箱:" + StrZxfz + ";厂外调试:" + StrCwtsfz;
 			document.pldadd.Cntsfz.value=StrCntsfz;
 			document.pldadd.Scxfz.value=StrScxfz;

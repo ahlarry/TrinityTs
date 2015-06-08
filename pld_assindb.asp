@@ -82,11 +82,8 @@ Function Tsindb()
 		set Rs=server.createobject("adodb.recordset")
 		Rs.open strSql,Conn,1,1
 		Do while not(Rs.eof Or Rs.bof)
-			If Rs("tsnr")="模头" Then
-				strTscs=strTscs+1
-			else
-				strDxcs=strDxcs+1
-			End If
+			strTscs=strTscs+1
+			strDxcs=strDxcs+1
 			Rs.movenext
 		Loop
 		strTscs=strTscs &":"& strDxcs	'调试次数
@@ -203,16 +200,18 @@ Function YLindb()
 	Rs.open strSql,Conn,1,3
 	If Not(Rs.eof Or Rs.bof) Then
 		Rs("sjtsyl")=stryl
+		Rs("rksj")=stryxtsyjs
+		Rs("cksj")=stryxtsyjs
 		Rs.update
 	End If
-	'结算厂内调试员得分
-	strSql="select * from [ins_tsfz] where lsh='"&strlsh&"'"
-	set Rs=server.createobject("adodb.recordset")
-	Rs.open strSql,Conn,1,3
-	If Rs.eof Or Rs.bof	Then	'防止重复计分
+'	'结算厂内调试员得分
+'	strSql="select * from [ins_tsfz] where lsh='"&strlsh&"'"
+'	set Rs=server.createobject("adodb.recordset")
+'	Rs.open strSql,Conn,1,3
+'	If Rs.eof Or Rs.bof	Then	'防止重复计分
 		Call ins_fz(stryxtsyjs)
-	End If
-	Call WriteSuccessMsg("流水号 " & strlsh &  " 任务书调试用料分配成功!","")
+'	End If
+	Call WriteSuccessMsg("流水号 " & strlsh &  " 任务书分配成功!","pld_assign.asp?rwlx=1")
 	Rs.Close
 End Function
 
@@ -223,14 +222,23 @@ Function ins_fz(stryxtsyjs)
 	'根据用料、调试次数、和出厂方式求的总的奖励
 	strSql="select * from [mission] where lsh='"&strlsh&"'"
 	set Rs=server.createobject("adodb.recordset")
-	Rs.open strSql,Conn,1,1
+	Rs.open strSql,Conn,1,3
 	If not(Rs.eof Or Rs.bof) Then
 		strTszf=Rs("cntsfz")	'厂内调试分值
 		strXszf=Rs("scxfz")		'生产线分值
 		strEdcs=Split(Rs("edtscs"),":")
 		strSjcs=Split(Rs("sjtscs"),":")
-		strCsxs=(strEdcs(0)-strSjcs(0))*0.02+(strEdcs(1)-strSjcs(1))*0.05	'调试次数系数
-		strYlxs=Fix((Rs("edtsyl")-Rs("sjtsyl"))/(Rs("edtsyl")*0.25))*0.05	'用料系数
+'		strCsxs=(strEdcs(0)-strSjcs(0))*0.02+(strEdcs(1)-strSjcs(1))*0.05	'调试次数系数
+'		strYlxs=Fix((Rs("edtsyl")-Rs("sjtsyl"))/(Rs("edtsyl")*0.25))*0.05	'用料系数
+		if strSjcs(0)>strEdcs(1) Then
+			strCsxs=(strEdcs(1)-strSjcs(0))*0.05
+		else if strSjcs(0)<strEdcs(0) Then
+				strCsxs=(strEdcs(0)-strSjcs(0))*0.05
+			else
+				strCsxs=0
+			End If
+		End If
+		strYlxs=0
 		Select Case Rs("ccfs")
 			Case "产品合格"
 				Tmpxs=1+strCsxs+strYlxs
@@ -248,127 +256,130 @@ Function ins_fz(stryxtsyjs)
 		If Tmpxs<0.6 Then Tmpxs=0.6 End If
 		strTszf=strTszf*Tmpxs
 		strXszf=strXszf*Tmpxs
+		Rs("cnsjfz")=Round(strTszf,1)
+		Rs.update
 	End If
-	'求出参与调试的每个人的系数
-	strSql="select * from [ins_tsxx] where lsh='"&strlsh&"' order by ID"
-	set Rs=server.createobject("adodb.recordset")
-	Rs.open strSql,Conn,1,1
-	ArrCs=Rs.recordcount
-	Do while not(Rs.eof Or Rs.bof)
-		Grxs="" : TsGrxs="" : XsGrxs="" : TsZgrxs=0 : XsZgrxs=0 : strGzz=""
-		'调试员个人系数，线上个人系数,本次调试参与调试员系数之和,本次调试参与调试线系数之和
-		strTsy=Rs("tsy")
-		strTsy=split(strTsy,", ")
-		For i = 0 to ubound(strTsy)
-			TmpSql="select * from [user] where UserName='"&strTsy(i)&"'"
-			set Rs2=server.createobject("adodb.recordset")
-			Rs2.open TmpSql,Conn,1,1
-			If not(Rs2.eof Or Rs2.bof) Then
-				Select case Rs2("Gzz")
-					case 1
-						If TsGrxs="" Then
-							TsGrxs=Rs2("Grxs")
-						else
-							TsGrxs=TsGrxs & "," & Rs2("Grxs")
-						End If
-					case 3
-						If XsGrxs="" Then
-							XsGrxs=Rs2("Grxs")
-						else
-							XsGrxs=XsGrxs & "," & Rs2("Grxs")
-						End If
-				End Select
-				If strGzz="" Then
-					strGzz=Rs2("GZZ")
-				else
-					strGzz=strGzz & "," & Rs2("GZZ")
-				End If
-				If Grxs="" Then
-					Grxs=Rs2("Grxs")
-				else
-					Grxs=Grxs & "," & Rs2("Grxs")
-				End If
-			End If
-			Rs2.Close
-		Next
-		TsGrxs=split(TsGrxs,",")
-		XsGrxs=split(XsGrxs,",")
-		strGzz=split(strGzz,",")
-		Grxs=split(Grxs,",")
-		for i = 0 to ubound(TsGrxs)
-			If TsZgrxs=0 Then
-				TsZgrxs=CSng(TsGrxs(i))
-			else
-				TsZgrxs=TsZgrxs + CSng(TsGrxs(i))
-			End If
-		next
-		for i = 0 to ubound(XsGrxs)
-			If XsZgrxs=0 Then
-				XsZgrxs=CSng(XsGrxs(i))
-			else
-				XsZgrxs=XsZgrxs + CSng(XsGrxs(i))
-			End If
-		next
-		for i = 0 to ubound(strTsy)
-			Select case strGzz(i)
-				case 1
-					If ArrGrxs="" Then
-						ArrGrxs=strTsy(i) &":"& CSng(Grxs(i))/TsZgrxs &":"& strGzz(i)
-					else
-						ArrGrxs=ArrGrxs &";"& strTsy(i) &":"& CSng(Grxs(i))/TsZgrxs &":"& strGzz(i)
-					End If
-				case 3
-					If ArrGrxs="" Then
-						ArrGrxs=strTsy(i) &":"& CSng(Grxs(i))/XsZgrxs &":"& strGzz(i)
-					else
-						ArrGrxs=ArrGrxs &";"& strTsy(i) &":"& CSng(Grxs(i))/XsZgrxs &":"& strGzz(i)
-						'组成形如"甲:0.20:1;乙:0.52:3;丙:0.31:1;甲:0.77:1"的字符串
-					End If
-			End Select
-		Next
-	Rs.movenext
-	Loop
 	Rs.Close
-	ArrGrxs=split(ArrGrxs,";")
-	For i=0 to Ubound(ArrGrxs)
-		TmpArr=split(ArrGrxs(i),":")
-		strSql="select * from [ins_tsfz] where lsh='"&strlsh&"' and zrr='"&TmpArr(0)&"'"
-		set Rs=server.createobject("adodb.recordset")
-		Rs.open strSql,Conn,1,3
-		If Rs.eof Or Rs.bof Then
-			Rs.AddNew
-			Rs("lsh")=strlsh
-			Rs("zrr")=TmpArr(0)
-			Rs("cycs")=1
-			If TmpArr(2)=1 Then
-				Rs("fz")=strTszf/ArrCs*TmpArr(1)
-				Rs("js")="调试"
-			else
-				Rs("fz")=strXszf/ArrCs*TmpArr(1)
-				Rs("js")="生产"
-			End If
-			Rs("sj")=stryxtsyjs
-			Rs.update
-		else
-			Rs("cycs")=Rs("cycs")+1
-			If TmpArr(2)=1 Then
-				Rs("fz")=Rs("fz")+strTszf/ArrCs*TmpArr(1)
-			else
-				Rs("fz")=Rs("fz")+strXszf/ArrCs*TmpArr(1)
-			End If
-			Rs("sj")=stryxtsyjs
-			Rs.update
-		End If
-	Rs.Close
-	Next
-	strSql="select * from [ins_tsfz] where lsh='"&strlsh&"' Order BY ID"
-	set rs=server.createobject("adodb.recordset")
-	rs.Open strSql,conn,1,3
-	do while not rs.eof
-		Rs("fz")=Round(Rs("fz"),1)
-		rs.movenext
-	loop
-	Rs.Close
+'	'求出参与调试的每个人的系数
+'	strSql="select * from [ins_tsxx] where lsh='"&strlsh&"' order by ID"
+'	set Rs=server.createobject("adodb.recordset")
+'	Rs.open strSql,Conn,1,1
+'	ArrCs=Rs.recordcount
+'	Do while not(Rs.eof Or Rs.bof)
+'		Grxs="" : TsGrxs="" : XsGrxs="" : TsZgrxs=0 : XsZgrxs=0 : strGzz=""
+'		'调试员个人系数，线上个人系数,本次调试参与调试员系数之和,本次调试参与调试线系数之和
+'		strTsy=Rs("tsy")
+'		strTsy=split(strTsy,", ")
+'		For i = 0 to ubound(strTsy)
+'			TmpSql="select * from [user] where UserName='"&strTsy(i)&"'"
+'			set Rs2=server.createobject("adodb.recordset")
+'			Rs2.open TmpSql,Conn,1,1
+'			If not(Rs2.eof Or Rs2.bof) Then
+'				Select case Rs2("Gzz")
+'					case 1
+'						If TsGrxs="" Then
+'							TsGrxs=Rs2("Grxs")
+'						else
+'							TsGrxs=TsGrxs & "," & Rs2("Grxs")
+'						End If
+'					case 3
+'						If XsGrxs="" Then
+'							XsGrxs=Rs2("Grxs")
+'						else
+'							XsGrxs=XsGrxs & "," & Rs2("Grxs")
+'						End If
+'				End Select
+'				If strGzz="" Then
+'					strGzz=Rs2("GZZ")
+'				else
+'					strGzz=strGzz & "," & Rs2("GZZ")
+'				End If
+'				If Grxs="" Then
+'					Grxs=Rs2("Grxs")
+'				else
+'					Grxs=Grxs & "," & Rs2("Grxs")
+'				End If
+'			End If
+'			Rs2.Close
+'		Next
+'		TsGrxs=split(TsGrxs,",")
+'		XsGrxs=split(XsGrxs,",")
+'		strGzz=split(strGzz,",")
+'		Grxs=split(Grxs,",")
+'		for i = 0 to ubound(TsGrxs)
+'			If TsZgrxs=0 Then
+'				TsZgrxs=CSng(TsGrxs(i))
+'			else
+'				TsZgrxs=TsZgrxs + CSng(TsGrxs(i))
+'			End If
+'		next
+'		for i = 0 to ubound(XsGrxs)
+'			If XsZgrxs=0 Then
+'				XsZgrxs=CSng(XsGrxs(i))
+'			else
+'				XsZgrxs=XsZgrxs + CSng(XsGrxs(i))
+'			End If
+'		next
+'		for i = 0 to ubound(strTsy)
+'			Select case strGzz(i)
+'				case 1
+'					If ArrGrxs="" Then
+'						ArrGrxs=strTsy(i) &":"& CSng(Grxs(i))/TsZgrxs &":"& strGzz(i)
+'					else
+'						ArrGrxs=ArrGrxs &";"& strTsy(i) &":"& CSng(Grxs(i))/TsZgrxs &":"& strGzz(i)
+'					End If
+'				case 3
+'					If ArrGrxs="" Then
+'						ArrGrxs=strTsy(i) &":"& CSng(Grxs(i))/XsZgrxs &":"& strGzz(i)
+'					else
+'						ArrGrxs=ArrGrxs &";"& strTsy(i) &":"& CSng(Grxs(i))/XsZgrxs &":"& strGzz(i)
+'						'组成形如"甲:0.20:1;乙:0.52:3;丙:0.31:1;甲:0.77:1"的字符串
+'					End If
+'			End Select
+'		Next
+'	Rs.movenext
+'	Loop
+'	Rs.Close
+'	ArrGrxs=split(ArrGrxs,";")
+'	For i=0 to Ubound(ArrGrxs)
+'		TmpArr=split(ArrGrxs(i),":")
+'		strSql="select * from [ins_tsfz] where lsh='"&strlsh&"' and zrr='"&TmpArr(0)&"'"
+'		set Rs=server.createobject("adodb.recordset")
+'		Rs.open strSql,Conn,1,3
+'		If Rs.eof Or Rs.bof Then
+'			Rs.AddNew
+'			Rs("lsh")=strlsh
+'			Rs("zrr")=TmpArr(0)
+'			Rs("cycs")=1
+'			If TmpArr(2)=1 Then
+'				Rs("fz")=strTszf/ArrCs*TmpArr(1)
+'				Rs("js")="调试"
+'			else
+'				Rs("fz")=strXszf/ArrCs*TmpArr(1)
+'				Rs("js")="生产"
+'			End If
+'			Rs("sj")=stryxtsyjs
+'			Rs.update
+'		else
+'			Rs("cycs")=Rs("cycs")+1
+'			If TmpArr(2)=1 Then
+'				Rs("fz")=Rs("fz")+strTszf/ArrCs*TmpArr(1)
+'			else
+'				Rs("fz")=Rs("fz")+strXszf/ArrCs*TmpArr(1)
+'			End If
+'			Rs("sj")=stryxtsyjs
+'			Rs.update
+'		End If
+'	Rs.Close
+'	Next
+'	strSql="select * from [ins_tsfz] where lsh='"&strlsh&"' Order BY ID"
+'	set rs=server.createobject("adodb.recordset")
+'	rs.Open strSql,conn,1,3
+'	do while not rs.eof
+'		Rs("fz")=Round(Rs("fz"),1)
+'		rs.movenext
+'	loop
+'	Rs.Close
 End Function
 
 Function Rukuindb()

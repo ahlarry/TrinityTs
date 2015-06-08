@@ -20,7 +20,7 @@ Dim strlsh, strddh, strkhm, strcz, StrRwlx, strFeedBack
 strlsh=Trim(Request("lsh"))
 If instr(strlsh,"，")>0 Then 	'如包含有全角符号转换为半角
 	strlsh=Replace(strlsh,"，",",")
-End If 
+End If
 strddh=Trim(Request("ddh"))
 strkhm=Trim(Request("khm"))
 strcz=Trim(Request("cz"))
@@ -163,7 +163,7 @@ strSql=""
 	End If
 	If strddh <> "" Then
 		strSql = "and  ddh like '%"&strddh&"%' " & strSql
-	End If	
+	End If
 	If strkhm <> "" Then
 		strSql = "and  khmc like '%"&strkhm&"%' " & strSql
 	End If
@@ -171,18 +171,18 @@ strSql=""
 		case "0"
 			strSql = "and isNull(sjjssj) and rwlx<>'非调' and rwlx<>'TB' " & strSql
 		case "1"
-			strSql = "and not(isNull(sjjssj)) and sjtsyl=0 " & strSql	
+			strSql = "and not(isNull(sjjssj)) and sjtsyl=0 " & strSql
 		case "2"
 			strSql = "and isNull(rksj) and (sjtsyl<>0 or rwlx='非调' or rwlx='TB') " & strSql
 		case "3"
-			strSql = "and not(isNull(rksj)) and isNull(cksj)" & strSql			
-	End Select	
+			strSql = "and not(isNull(rksj)) and isNull(cksj)" & strSql
+	End Select
 
 set rs=server.createobject("adodb.recordset")
-If StrRwlx="0" Then 
+If StrRwlx="0" Then
 	sqltex="select * from mission where not(isNull(cksj)) and isNull(cwjssj) Order by lsh"
 else
-	sqltex="select * from mission where isNull(cksj) "&strsql&" Order by jhjssj,lsh"	
+	sqltex="select * from mission where isNull(cksj) "&strsql&" Order by jhjssj,lsh"
 End If
 rs.open sqltex,conn,1,1
 dim PerPage
@@ -190,7 +190,7 @@ If Strlsh="" Then
 	PerPage=20
 else
 	PerPage=10
-End If 
+End If
 '假如没有数据时
 If rs.eof and rs.bof then
 response.write "<p align='center'><font color='#ff0000'>没有找到相关任务！</font></p>"
@@ -208,8 +208,8 @@ next
 If checkpage<>0 then
   If NOT IsEmpty(request("page")) Then
    CurrentPage=Cint(request("page"))
-   If CurrentPage < 1 Then CurrentPage = 1 
-   If CurrentPage > Rs.PageCount Then CurrentPage = Rs.PageCount 
+   If CurrentPage < 1 Then CurrentPage = 1
+   If CurrentPage > Rs.PageCount Then CurrentPage = Rs.PageCount
   Else
    CurrentPage= 1
   End If
@@ -285,14 +285,14 @@ loop
 end if
 %>
   </tbody>
-  
+
 </table>
 <%
       Call showpage("pld_assign.asp?"&strFeedBack,Rs.RecordCount,PerPage,True,True,"条")
       %>
 <%End If
   End Function
-  
+
   Function MAssign()
   %>
 <%
@@ -302,20 +302,20 @@ end if
 		set Rs=server.createobject("adodb.recordset")
 		Rs.open strSql,Conn,1,1
 		If Not(Rs.eof Or Rs.bof) Then
-			If IsNull(Rs("sjjssj")) and Rs("rwlx")<>"非调" and Rs("rwlx")<>"TB" Then				
+			If IsNull(Rs("sjjssj")) and Rs("rwlx")<>"非调" and Rs("rwlx")<>"TB" Then
 				Call InsAssign()
 			else
 				if Rs("sjtsyl")=0  and Rs("rwlx")<>"非调" and Rs("rwlx")<>"TB" Then
 					Call YlAssign()
 				else
-					if isnull(Rs("rksj")) Then 
+					if isnull(Rs("rksj")) Then
 						Call RkAssign()
 					else
 						If IsNull(Rs("cksj")) Then
 						 	Call CkAssign()
-						End If					
-					End If 
-				End If	
+						End If
+					End If
+				End If
 			End if
 		else
 			Response.write("<font color='red'>任务不存在或已完成！</font>")
@@ -330,16 +330,16 @@ end if
 			strSql="select * from [mission] where lsh='"&TmpArr(i)&"' and isNull(cwjssj)"
 			set Rs=server.createobject("adodb.recordset")
 			Rs.open strSql,Conn,1,1
-			If Rs.eof Or Rs.bof Then 
+			If Rs.eof Or Rs.bof Then
 				errmsg=errmsg&"流水号 <strong>"&TmpArr(i)&"</strong> 任务不存在或已完成!<br>"
 			else
-				If strjdu="" Then 
+				If strjdu="" Then
 					strjdu=Rs("ysjg")
-				else 
-					strjdu=strjdu&","&Rs("ysjg")			
+				else
+					strjdu=strjdu&","&Rs("ysjg")
 				End If
 			End If
-		Next 
+		Next
 		Dim Tmpjdu,j
 '		errmsg=errmsg&strjdu
 		strjdu=split(strjdu,",")
@@ -347,12 +347,12 @@ end if
 			For j=1 to ubound(strjdu)
 				if strjdu(i)<>strjdu(j) then
 					errmsg=errmsg&"任务进度不一致，无法合成一批录入!<br>"
-					exit for 
-				End If 
+					exit for
+				End If
 			Next
-			if instr(errmsg,"进度不一致")>0 then exit for 
-		Next 
-		If errmsg<>"" Then 
+			if instr(errmsg,"进度不一致")>0 then exit for
+		Next
+		If errmsg<>"" Then
 			Call WriteErrMsg()
 		else
 			If strjdu(0)="正在调试" Then
@@ -360,7 +360,7 @@ end if
 			else
 				Call ExtFzindb(strlsh)
 			End If
-		End If 
+		End If
 	End If
 End Function
 
@@ -392,7 +392,7 @@ Function Assed_ins()	'已分配厂内任务
 <%End If
     Rs.Close
   End Function
-  
+
 Function Assed_ext(ilsh)	'已分配厂外任务
 	strSql="select * from [ext_tsxx] where lsh='"&ilsh&"'"
 	set Rs=server.createobject("adodb.recordset")
@@ -436,7 +436,7 @@ Function Assed_ext(ilsh)	'已分配厂外任务
 <%End If
   Rs.Close
   End Function
-  
+
   Function InsAssign()	'厂内任务分配%>
 <form name="Form_Assing" id="Form_Assing" method="post" action="pld_assindb.asp?action=Massign">
   <table width="70%" border="2" bordercolor="#33FFCC">
@@ -485,8 +485,9 @@ Function Assed_ext(ilsh)	'已分配厂外任务
     <tr>
       <td colspan="3"><div align="center">调试内容:
           <select name="tsnr">
+            <option value="全套">全套</option>
             <option value="模头">模头</option>
-            <option value="定型" selected>定型</option>
+            <option value="定型">定型</option>
           </select>
           &nbsp;&nbsp;参与次数:
           <input type="text" name="cycs" size="5" value="1" onKeyPress="javascript:validationNumber(this, 'u_float', 100, '');">
@@ -525,7 +526,7 @@ Function YlAssign()		'用料
           <script language=javascript>
   		var myDate=new dateSelector();
   		myDate.year;
- 		myDate.inputName='yxtsyjs';  
+ 		myDate.inputName='yxtsyjs';
   		myDate.display();
 		</script>
           &nbsp;&nbsp;
@@ -548,7 +549,7 @@ Function RkAssign()		'入库
           <script language=javascript>
   		var myDate=new dateSelector();
   		myDate.year;
- 		myDate.inputName='rksj';  
+ 		myDate.inputName='rksj';
   		myDate.display();
 		</script>
           &nbsp;&nbsp;
@@ -571,7 +572,7 @@ Function CkAssign()		'出库
           <script language=javascript>
   		var myDate=new dateSelector();
   		myDate.year;
- 		myDate.inputName='cksj';  
+ 		myDate.inputName='cksj';
   		myDate.display();
 		</script>
           &nbsp;&nbsp;
@@ -592,7 +593,7 @@ For i=0 to ubound(TmpArr)
     strSql="select * from [mission] where lsh='"&TmpArr(i)&"'"
 	set Rs=server.createobject("adodb.recordset")
 	Rs.open strSql,Conn,1,1
-	if not Rs.eof Then 
+	if not Rs.eof Then
 		Select Case Rs("dmdj")
 			Case "A类":Tmpstr="1"
 			Case "B类":Tmpstr="2"
@@ -602,11 +603,11 @@ For i=0 to ubound(TmpArr)
 			Case "F类":Tmpstr="6"
 			Case "G类":Tmpstr="7"
 			Case "H类":Tmpstr="8"
-			Case Else:Tmpstr="9"				
-		End Select		
+			Case Else:Tmpstr="9"
+		End Select
 		TmpArr(i)=TmpArr(i)&"||"&Tmpstr&Left(Rs("mjdj"),1)
-	End If 
-	Rs.Close 
+	End If
+	Rs.Close
 Next
 %>
 <form name="Form_ExtA" id="Form_ExtA" method="post" action="pld_assindb.asp?action=Massign">
@@ -616,21 +617,21 @@ Next
     </tr>
     <%
     Tmpstr=ubound(TmpArr)/3
-    if int(Tmpstr)<>Tmpstr Then   
-  		Tmpstr=int(Tmpstr+1)  
+    if int(Tmpstr)<>Tmpstr Then
+  		Tmpstr=int(Tmpstr+1)
 	end if
 	i=0
 	For j=0 to Tmpstr
     %>
-    <tr>    
+    <tr>
         <%k=0
        For k=i to i+2
         	If k <= ubound(TmpArr) Then
-      			LshArr=split(TmpArr(k),"||")	
+      			LshArr=split(TmpArr(k),"||")
      			Response.Write("<td align='center'><font color='#FF0000'>"&LshArr(0)&":"&LshArr(1)&"&nbsp;模具系数:<input name='mjxs"&k&"' type='text' size='10'></font></td>")
      		End If
        next
-        %>         
+        %>
     </tr>
     <%i=i+3
     next%>
@@ -688,7 +689,7 @@ Function ExtFzindb(slsh)	'厂外任务分值计算(主任打系统)
     <caption>
     <span class="STYLE2">分配<%=slsh%> 调节系数</span><br />
     </caption>
-    <%	'-----------------------------------求厂外调试分值	
+    <%	'-----------------------------------求厂外调试分值
     Dim strtsfz,ilsh,iid,iyfz,ixs,ifz,ispan
     strtsfz=0 : ilsh=slsh : strlsh=split(slsh,",")
     For i=0 to ubound(strlsh)
@@ -719,8 +720,8 @@ Function ExtFzindb(slsh)	'厂外任务分值计算(主任打系统)
         <input type="hidden" id=<%=ifz%> name=<%=ifz%> value=<%=Rs("fz")%> /></td>
     </tr>
     <%
-    Rs.movenext 
-	i=i+1    
+    Rs.movenext
+	i=i+1
 	Loop
 	Rs.Close
 %>
@@ -738,47 +739,47 @@ Function ExtFzindb(slsh)	'厂外任务分值计算(主任打系统)
 <script language="javascript">
 //厂内调试员选择
 function fun_select_addany(theform){
-    var i; 
+    var i;
     for (i=0;i<theform.dxtsy.length;i++){
         if (theform.dxtsy.options[i].selected == true){
            theform.yxtsy.options[theform.yxtsy.length]=new Option(theform.dxtsy.options[i].text);
-        } 
+        }
     }
     sort_select(theform);
-} 
+}
 
 function fun_select_addall(theform){
-    var i;   
+    var i;
     for (i=0;i<theform.dxtsy.length;i++){
-        theform.yxtsy.options[theform.yxtsy.length]=new Option(theform.dxtsy.options[i].text);    
+        theform.yxtsy.options[theform.yxtsy.length]=new Option(theform.dxtsy.options[i].text);
     }
-    sort_select(theform); 
-}  
+    sort_select(theform);
+}
 
 function fun_select_dltany(theform){
-   var i; 
+   var i;
    for (i=0;i<theform.yxtsy.length;i++){
        if (theform.yxtsy.options[i].selected == true){
           theform.yxtsy.options[i] =new Option("");
           theform.yxtsy.options.remove(i);
           i--;
-       } 
+       }
    }
    sort_select(theform);
 }
 
 function fun_select_dltall(theform){
-    var i;   
+    var i;
     for (i=0;i<theform.yxtsy.length;i++){
     }
-    theform.yxtsy.length=0;            
+    theform.yxtsy.length=0;
     sort_select(theform);
 }
 
 function sort_select(theform){
-    var i; 
-    var right_array = new Array();   
-    var o = new Object();                 
+    var i;
+    var right_array = new Array();
+    var o = new Object();
     for (i=0;i<theform.yxtsy.length;i++){
         right_array[i] = new Array(theform.yxtsy.options[i].text);
     }
@@ -794,18 +795,18 @@ function sort_select(theform){
 	{
 	right_array[o[key]] = key;
 	}
-    theform.yxtsy.length=0;            
+    theform.yxtsy.length=0;
     for (i=0;i<right_array.length;i++){
        		theform.yxtsy.options[theform.yxtsy.length]=new Option(right_array[i]);
     }
-    right_array = new Array();      
-}   
+    right_array = new Array();
+}
 
 function SelTsy(theform)
 {
     for (i=0;i<theform.yxtsy.length;i++){
         theform.yxtsy.options[i].selected = true;
-    }    
+    }
 }
 //增加和删除行
 i=1;
@@ -821,16 +822,16 @@ function RowReset(){
    var RowCount=ExtA_TB.rows.length-1
    var ReName=RowCount
    for (var i=0;i<ExtA_TB.rows[RowCount].cells.length;i++){
-      
+
       var str=ExtA_TB.rows[RowCount].cells[i].innerHTML
       str=(str.replace(/name=[\d]*/i,"name="+ReName));
-      ExtA_TB.rows[RowCount].cells[i].innerHTML=str 
+      ExtA_TB.rows[RowCount].cells[i].innerHTML=str
    }
 }
 
 function Delrow(){
 	if (ExtA_TB.rows.length >1){
-		ExtA_TB.deleteRow(ExtA_TB.rows.length-1);    
+		ExtA_TB.deleteRow(ExtA_TB.rows.length-1);
 	}
 	document.Form_ExtA.TsNum.value=ExtA_TB.rows.length;
 }
@@ -843,14 +844,14 @@ function View(tb){
   }
 }
 
-function ShortcutKey(){ 
+function ShortcutKey(){
 	if((event.ctrlKey)&&(window.event.keyCode==13)) //"Ctrl" + "回车"添加一行
-   		Addrow()  		
+   		Addrow()
 	if((event.shiftKey)&&(window.event.keyCode==13)) //"Shift" + "回车"删除一行
 		Delrow()
-} 
+}
 
-document.onkeydown=ShortcutKey; 
+document.onkeydown=ShortcutKey;
 //厂外调试主任调节系数
 function ChangeXs(value,tsfz,n){
 	var yfz=eval("document.all.yfz"+ n +".value");
@@ -871,7 +872,7 @@ function CheckXs(arg){
 		alert("系数总和必须为0!")
 		return false;
 	}
-	else 
+	else
 	{
 		return true;
 	}
