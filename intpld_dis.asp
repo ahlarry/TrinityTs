@@ -99,17 +99,21 @@ end function
         <tr>
           <td><span class="STYLE4">技术等级:</span></td>
           <td class="STYLE4"><%=Rs("jsdj")%>&nbsp;</td>
-          <td><span class="STYLE4">模具等级:</span></td>
-          <td class="STYLE4"><%=Rs("mjdj")%>&nbsp;</td>
+          <td><span class="STYLE4">模具类型:</span></td>
+          <td class="STYLE4"><%=Rs("mjlx")%>&nbsp;</td>
           <td><span class="STYLE4">断面等级:</span></td>
           <td class="STYLE4"><%=Rs("dmdj")%>&nbsp;</td>
         </tr>
         <tr>
           <td><span class="STYLE4">任务类型:</span></td>
           <td class="STYLE4"><%=Rs("rwlx")%>&nbsp;</td>
-          <td><span class="STYLE4">模具类型:</span></td>
-          <td class="STYLE4"><%=Rs("mjlx")%>&nbsp;</td>
-          <td><span class="STYLE4">主壁厚﹥2.7mm:</span></td>
+          <td><span class="STYLE4">欧式主材腔室﹥5</span></td>
+          <td class="STYLE4"><%If Rs("qs")="1" Then%>
+            是
+            <%else%>
+            否
+            <%End If%>&nbsp;</td>
+          <td><span class="STYLE4">主壁厚﹥2.8mm:</span></td>
           <td class="STYLE4"><%If Rs("bh")="1" Then%>
             是
             <%else%>

@@ -318,7 +318,7 @@ do while not rs.eof
           <td class="STYLE4"><div align="center"><a href="intpld_dis.asp?s_lsh=<%=rs("lsh")%>"><%=Rs("lsh")%></a></div></td>
           <td class="STYLE4"><div align="center"><%=cutstr(Rs("khmc"),10)%>&nbsp;</div></td>
           <td class="STYLE4"><div align="center"><%=Rs("rwlx")%>&nbsp;</div></td>
-          <td class="STYLE4"><div align="center"><%=Rs("sjtscs")%>&nbsp;</div></td>
+          <td class="STYLE4"><div align="center"><%=Rs("sjtscs")&"("&Rs("edtscs")&")"%>&nbsp;</div></td>
           <td class="STYLE4"><div align="center"><%=FormatDateTime(Rs("sjjssj"),2)%>&nbsp;</div></td>
           <td class="STYLE4"><div align="center"><%=Rs("cntsfz")%>&nbsp;</div></td>
           <td class="STYLE4"><div align="center"><%=Rs("cnsjfz")%>&nbsp;</div></td>
